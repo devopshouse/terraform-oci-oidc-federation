@@ -214,7 +214,7 @@ resource "oci_identity_domains_identity_propagation_trust" "gitlab_ci_trust" {
 
   active              = var.app_active
   allow_impersonation = true
-  public_key_endpoint = "${var.gitlab.issuer}/oauth/discovery/keys"
+  public_key_endpoint = coalesce(var.gitlab.public_key_endpoint, "${var.gitlab.issuer}/oauth/discovery/keys")
 
   client_claim_name   = "sub"
   client_claim_values = local.gitlab_sub_claims

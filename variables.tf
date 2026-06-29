@@ -49,10 +49,11 @@ variable "github" {
 
 variable "gitlab" {
   type = object({
-    issuer   = string # ex: https://gitlab.com ou self-hosted
-    ref      = optional(string, "main")
-    ref_type = optional(string, "branch") # branch | tag
-    projects = optional(list(string), []) # formato: group/project
+    issuer             = string          # ex: https://gitlab.com ou self-hosted
+    ref                = optional(string, "main")
+    ref_type           = optional(string, "branch") # branch | tag
+    projects           = optional(list(string), []) # formato: group/project
+    public_key_endpoint = optional(string, null)    # override para GitLab privado (IP não roteável pela OCI)
   })
   description = "Config GitLab CI OIDC. Obrigatório quando \"gitlab\" ∈ ci_platforms."
   default     = null

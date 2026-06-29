@@ -1,0 +1,5 @@
+oci_tenancy_id             = "ocid1.tenancy.oc1..aaaa..."
+oci_compartment_id         = "ocid1.compartment.oc1..aaaa..."
+oci_region                 = "sa-saopaulo-1"
+gitlab_issuer              = "https://gitlab.internal.example.com"
+gitlab_public_key_endpoint = "https://objectstorage.<region>.oraclecloud.com/p/<par-token>/n/<namespace>/b/<bucket>/o/gitlab-jwks.json"

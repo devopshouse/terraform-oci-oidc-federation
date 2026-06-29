@@ -1,0 +1,4 @@
+github_org         = "my-org"
+oci_tenancy_id     = "ocid1.tenancy.oc1..aaaa..."
+oci_compartment_id = "ocid1.compartment.oc1..aaaa..."
+oci_region         = "sa-saopaulo-1"

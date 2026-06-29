@@ -1,0 +1,41 @@
+# Place this file at .gitlab-ci.yml in your GitLab repository.
+# Requires two CI/CD variables (Settings → CI/CD → Variables, both masked):
+#   OCI_CONFIG_JSON  — from: terraform output -raw oci_config_json
+#   OCIR_CONFIG_JSON — from: terraform output -raw ocir_config_json
+
+stages:
+  - deploy
+
+oci-auth-example:
+  stage: deploy
+  image: ubuntu:22.04
+  id_tokens:
+    OCI_TOKEN:
+      aud: "https://cloud.oracle.com"
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq curl jq docker.io
+
+  script:
+    - |
+      IDCS_ENDPOINT=$(echo "$OCI_CONFIG_JSON" | jq -r '.oci_idcs_endpoint')
+      CLIENT_ID=$(echo "$OCI_CONFIG_JSON"     | jq -r '.oci_client_id')
+      CLIENT_SECRET=$(echo "$OCI_CONFIG_JSON" | jq -r '.oci_client_secret')
+
+      UPST=$(curl -sSf -X POST "${IDCS_ENDPOINT}/oauth2/v1/token" \
+        -u "${CLIENT_ID}:${CLIENT_SECRET}" \
+        -d "grant_type=urn:ietf:params:oauth:grant-type:token-exchange" \
+        -d "requested_token_type=urn:oci:token-type:oci-upst" \
+        -d "subject_token=${OCI_TOKEN}" \
+        -d "subject_token_type=urn:ietf:params:oauth:token-type:jwt" \
+        | jq -r '.token')
+
+      export OCI_UPST="${UPST}"
+
+    - |
+      OCIR_URL=$(echo "$OCIR_CONFIG_JSON"      | jq -r '.ocir_url')
+      OCIR_USER=$(echo "$OCIR_CONFIG_JSON"     | jq -r '.ocir_username')
+      OCIR_PASSWORD=$(echo "$OCIR_CONFIG_JSON" | jq -r '.ocir_password')
+      echo "$OCIR_PASSWORD" | docker login "${OCIR_URL}" -u "${OCIR_USER}" --password-stdin
+
+  only:
+    - main

@@ -24,6 +24,7 @@ variable "github" {
     branch         = optional(string, "main")
     repositories   = optional(list(string), []) # format: org/repo
     create_secrets = optional(bool, true)
+    secret_name    = optional(string, "OCI_OIDC_CONFIG")
   })
   description = "GitHub Actions OIDC configuration. Required when \"github\" ∈ ci_platforms."
   default     = {}

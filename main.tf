@@ -224,6 +224,6 @@ resource "github_actions_secret" "ci_oidc_config" {
   for_each = local.github_repo_names
 
   repository  = each.key
-  secret_name = "OCI_OIDC_CONFIG"
+  secret_name = var.github.secret_name
   value       = local.ci_oidc_config_json
 }

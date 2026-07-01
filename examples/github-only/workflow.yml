@@ -1,6 +1,6 @@
 # Place this file at .github/workflows/oci-auth.yml in your repository.
 # It shows how to exchange the GitHub OIDC token for an OCI UPST and
-# authenticate with OCIR using the secrets provisioned by this module.
+# use the resulting UPST with OCI APIs.
 
 name: OCI authentication example
 
@@ -49,17 +49,7 @@ jobs:
           echo "::add-mask::${UPST}"
           echo "upst=${UPST}" >> "$GITHUB_OUTPUT"
 
-      # Step 2: Authenticate with OCIR for Docker operations.
-      - name: Log in to OCIR
-        env:
-          OCI_OIDC_CONFIG: ${{ secrets.OCI_OIDC_CONFIG }}
-        run: |
-          OCIR_URL=$(echo "$OCI_OIDC_CONFIG"      | jq -r '.ocir_url')
-          OCIR_USER=$(echo "$OCI_OIDC_CONFIG"     | jq -r '.ocir_username')
-          OCIR_PASSWORD=$(echo "$OCI_OIDC_CONFIG" | jq -r '.ocir_password')
-          echo "$OCIR_PASSWORD" | docker login "${OCIR_URL}" -u "${OCIR_USER}" --password-stdin
-
-      # Step 3: Use the UPST with OCI CLI or an OCI SDK.
+      # Step 2: Use the UPST with OCI CLI or an OCI SDK.
       # Export OCI_CLI_AUTH=security_token and write the UPST to a token file,
       # or pass it directly to SDK calls via the security_token_file config.
       - name: Example OCI CLI call
@@ -69,5 +59,6 @@ jobs:
         run: |
           REGION=$(echo "$OCI_OIDC_CONFIG"        | jq -r '.oci_region')
           COMPARTMENT=$(echo "$OCI_OIDC_CONFIG"   | jq -r '.oci_compartment_id')
-          echo "Authenticated to region=${REGION}, compartment=${COMPARTMENT}"
+          OCI_USER_ID=$(echo "$OCI_OIDC_CONFIG"    | jq -r '.oci_user_id')
+          echo "Authenticated to region=${REGION}, compartment=${COMPARTMENT}, user=${OCI_USER_ID}"
           # oci compute instance list --compartment-id "${COMPARTMENT}" ...

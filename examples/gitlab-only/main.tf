@@ -60,7 +60,7 @@ output "gitlab_subject_claims" {
 }
 
 output "ci_oidc_config_json" {
-  description = "Store this as the OCI_OIDC_CONFIG CI/CD variable in GitLab (masked). Contains OCI + OCIR fields unified."
+  description = "Store this as the OCI_OIDC_CONFIG CI/CD variable in GitLab (masked)."
   sensitive   = true
   value       = module.oci_oidc.ci_oidc_config_json
 }

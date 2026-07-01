@@ -151,7 +151,7 @@ terraform apply
 Store outputs as masked GitLab CI/CD variables (Settings → CI/CD → Variables):
 
 ```bash
-terraform output -raw ci_oidc_config_json   # → OCI_OIDC_CONFIG variable (OCI + OCIR fields unified)
+terraform output -raw ci_oidc_config_json   # → OCI_OIDC_CONFIG variable
 terraform output gitlab_oidc_audience       # → use in id_tokens.OCI_TOKEN.aud
 ```
 

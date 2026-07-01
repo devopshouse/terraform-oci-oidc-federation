@@ -20,9 +20,7 @@ GitHub / GitLab JWKS ──── publishes signing keys ────► OCI IDC
                                                      OCI APIs / OCIR
 ```
 
-OCIR authentication uses a classic username/password auth token because OCIR does not support the UPST flow. A dedicated OCIR user, auth token, group, and policy are always created alongside the service user. By default the OCIR policy allows push/pull and repository creation in the target compartment; set `ocir_allowed_repositories` to restrict push/pull to existing repository names.
-
-The generated `ocir_username` follows OCI's Docker login format. For the `Default` identity domain it is `<namespace>/<user>`. For non-default identity domains it is `<namespace>/<identity-domain>/<user>`.
+OCIR authentication uses a classic username/password auth token because OCIR does not support the UPST flow. A dedicated OCIR user, auth token, group, and policy are always created alongside the service user. By default the OCIR policy allows push/pull and repository creation in the target compartment; set `ocir_allowed_repositories` to restrict push/pull to existing repository names. The generated CI secret does not include OCIR username/password fields.
 
 ## Resources created
 
@@ -152,7 +150,7 @@ Leaving `ocir_allowed_repositories = []` allows the OCIR user to push/pull broad
 
 | Name | Sensitive | Description |
 |---|---|---|
-| `ci_oidc_config_json` | Yes | Unified JSON blob (OCI + OCIR fields) for the `OCI_OIDC_CONFIG` secret. Contains IDCS endpoint, client ID/secret, region, tenancy OCID, compartment OCID, `ocir_username`, `ocir_password`, and `ocir_url`. `ocir_username` is `<namespace>/<user>` for the `Default` domain and `<namespace>/<identity-domain>/<user>` for non-default domains. Written automatically as a GitHub secret when `create_github_secrets = true`. |
+| `ci_oidc_config_json` | Yes | JSON blob for the `OCI_OIDC_CONFIG` secret. Contains IDCS endpoint, client ID/secret, region, tenancy OCID, compartment OCID, and `oci_user_id`. Written automatically as a GitHub secret when `create_github_secrets = true`. |
 | `iam_group_ocid` | No | OCID of the created IDCS group. |
 | `github_subject_claims` | No | Exact `sub` claim strings registered in the GitHub trust. Useful for debugging authentication failures. |
 | `gitlab_subject_claims` | No | Exact `sub` claim strings registered in the GitLab trust. |

@@ -14,7 +14,7 @@ terraform apply
 After apply, store the outputs as **masked** CI/CD variables in GitLab (Settings → CI/CD → Variables):
 
 ```bash
-terraform output -raw ci_oidc_config_json   # → OCI_OIDC_CONFIG variable (OCI + OCIR fields unified)
+terraform output -raw ci_oidc_config_json   # → OCI_OIDC_CONFIG variable
 ```
 
 Also note the audience value for your pipeline:
@@ -37,4 +37,4 @@ Copy [`gitlab-ci.yml`](gitlab-ci.yml) to `.gitlab-ci.yml` in your repository. It
 
 1. Use the `id_tokens` block to request a GitLab OIDC JWT
 2. Exchange the JWT for an OCI UPST
-3. Log in to OCIR for Docker operations
+3. Use the UPST with OCI APIs, CLI, or SDKs

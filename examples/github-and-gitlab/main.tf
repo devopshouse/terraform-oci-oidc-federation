@@ -75,7 +75,7 @@ output "gitlab_oidc_audience" {
 }
 
 output "ci_oidc_config_json" {
-  description = "Store this as OCI_OIDC_CONFIG in GitLab CI/CD variables (masked). Contains OCI + OCIR fields unified."
+  description = "Store this as OCI_OIDC_CONFIG in GitLab CI/CD variables (masked)."
   sensitive   = true
   value       = module.oci_oidc.ci_oidc_config_json
 }

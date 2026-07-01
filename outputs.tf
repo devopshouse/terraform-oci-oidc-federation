@@ -1,5 +1,5 @@
 output "ci_oidc_config_json" {
-  description = "Ready-to-use JSON value for the OCI_OIDC_CONFIG CI secret (OCI + OCIR fields unified)."
+  description = "Ready-to-use JSON value for the OCI_OIDC_CONFIG CI secret."
   sensitive   = true
   value       = local.ci_oidc_config_json
 }

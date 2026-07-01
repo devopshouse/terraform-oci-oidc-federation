@@ -45,8 +45,6 @@ locals {
     oci_region         = var.oci_region
     oci_tenancy_id     = oci_identity_domains_app.git_actions_app.tenancy_ocid
     oci_compartment_id = var.oci_compartment_id
-    ocir_username      = "${data.oci_objectstorage_namespace.os.namespace}/${local.ocir_login_name}"
-    ocir_password      = try(oci_identity_domains_auth_token.ocir_token.token, "")
-    ocir_url           = "ocir.${var.oci_region}.oci.oraclecloud.com/${data.oci_objectstorage_namespace.os.namespace}"
+    oci_user_id        = oci_identity_domains_user.git_service_user.id
   })
 }

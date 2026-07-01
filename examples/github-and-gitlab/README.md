@@ -16,7 +16,7 @@ terraform apply
 Store GitLab CI/CD variables (masked) after apply:
 
 ```bash
-terraform output -raw ci_oidc_config_json   # → OCI_OIDC_CONFIG variable in GitLab (OCI + OCIR fields unified)
+terraform output -raw ci_oidc_config_json   # → OCI_OIDC_CONFIG variable in GitLab
 terraform output gitlab_oidc_audience       # → use in id_tokens.OCI_TOKEN.aud
 ```
 

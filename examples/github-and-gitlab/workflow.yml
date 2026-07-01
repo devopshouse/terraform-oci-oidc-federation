@@ -43,11 +43,11 @@ jobs:
           echo "::add-mask::${UPST}"
           echo "upst=${UPST}" >> "$GITHUB_OUTPUT"
 
-      - name: Log in to OCIR
+      - name: Show OCI context
         env:
           OCI_OIDC_CONFIG: ${{ secrets.OCI_OIDC_CONFIG }}
         run: |
-          OCIR_URL=$(echo "$OCI_OIDC_CONFIG"      | jq -r '.ocir_url')
-          OCIR_USER=$(echo "$OCI_OIDC_CONFIG"     | jq -r '.ocir_username')
-          OCIR_PASSWORD=$(echo "$OCI_OIDC_CONFIG" | jq -r '.ocir_password')
-          echo "$OCIR_PASSWORD" | docker login "${OCIR_URL}" -u "${OCIR_USER}" --password-stdin
+          REGION=$(echo "$OCI_OIDC_CONFIG"      | jq -r '.oci_region')
+          COMPARTMENT=$(echo "$OCI_OIDC_CONFIG" | jq -r '.oci_compartment_id')
+          OCI_USER_ID=$(echo "$OCI_OIDC_CONFIG" | jq -r '.oci_user_id')
+          echo "Authenticated to region=${REGION}, compartment=${COMPARTMENT}, user=${OCI_USER_ID}"

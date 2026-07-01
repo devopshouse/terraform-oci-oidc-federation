@@ -15,7 +15,7 @@ oci-auth-example:
     OCI_TOKEN:
       aud: "https://cloud.oracle.com"
   before_script:
-    - apt-get update -qq && apt-get install -y -qq curl jq docker.io
+    - apt-get update -qq && apt-get install -y -qq curl jq
 
   script:
     # Step 1: Exchange the GitLab OIDC token for an OCI UPST.
@@ -35,18 +35,12 @@ oci-auth-example:
 
       export OCI_UPST="${UPST}"
 
-    # Step 2: Authenticate with OCIR for Docker operations.
-    - |
-      OCIR_URL=$(echo "$OCI_OIDC_CONFIG"      | jq -r '.ocir_url')
-      OCIR_USER=$(echo "$OCI_OIDC_CONFIG"     | jq -r '.ocir_username')
-      OCIR_PASSWORD=$(echo "$OCI_OIDC_CONFIG" | jq -r '.ocir_password')
-      echo "$OCIR_PASSWORD" | docker login "${OCIR_URL}" -u "${OCIR_USER}" --password-stdin
-
-    # Step 3: Use the UPST with the OCI CLI or SDK here.
+    # Step 2: Use the UPST with the OCI CLI or SDK here.
     - |
       REGION=$(echo "$OCI_OIDC_CONFIG"      | jq -r '.oci_region')
       COMPARTMENT=$(echo "$OCI_OIDC_CONFIG" | jq -r '.oci_compartment_id')
-      echo "Authenticated to region=${REGION}, compartment=${COMPARTMENT}"
+      OCI_USER_ID=$(echo "$OCI_OIDC_CONFIG" | jq -r '.oci_user_id')
+      echo "Authenticated to region=${REGION}, compartment=${COMPARTMENT}, user=${OCI_USER_ID}"
       # oci compute instance list --compartment-id "${COMPARTMENT}" ...
 
   only:

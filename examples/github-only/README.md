@@ -18,12 +18,12 @@ terraform apply
 - IDCS group `grp-ci-actions` containing only the UPST service user
 - IDCS Confidential Application and Identity Propagation Trust for GitHub Actions
 - IAM policy granting the CI group access to the configured compartment
-- GitHub Actions secret `OCI_OIDC_CONFIG` in each listed repository (OCI + OCIR fields unified)
+- GitHub Actions secret `OCI_OIDC_CONFIG` in each listed repository
 
 ## Workflow authentication
 
 Copy [`workflow.yml`](workflow.yml) to `.github/workflows/oci-auth.yml` in your repository. It shows how to:
 
 1. Request the GitHub OIDC JWT and exchange it for an OCI UPST
-2. Log in to OCIR for Docker push/pull operations
+2. Use the UPST with OCI APIs, CLI, or SDKs
 3. Use the UPST with the OCI CLI or SDK

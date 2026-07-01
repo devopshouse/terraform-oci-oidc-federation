@@ -21,10 +21,10 @@ locals {
 
   ci_oidc_config_json = jsonencode({
     oci_idcs_endpoint  = local.idcs_endpoint
-    oci_client_id      = oci_identity_domains_app.git_actions_app.name
-    oci_client_secret  = oci_identity_domains_app.git_actions_app.client_secret
+    oci_client_id      = oci_identity_domains_app.oci_app.name
+    oci_client_secret  = oci_identity_domains_app.oci_app.client_secret
     oci_region         = var.oci_region
-    oci_tenancy_id     = oci_identity_domains_app.git_actions_app.tenancy_ocid
+    oci_tenancy_id     = oci_identity_domains_app.oci_app.tenancy_ocid
     oci_compartment_id = var.oci_compartment_id
   })
 }

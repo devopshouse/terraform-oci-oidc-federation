@@ -7,7 +7,7 @@ data "oci_objectstorage_namespace" "os" {
   compartment_id = var.oci_tenancy_id
 }
 
-resource "oci_identity_domains_user" "git_service_user" {
+resource "oci_identity_domains_user" "oci_service_user" {
   idcs_endpoint = local.idcs_endpoint
   schemas       = ["urn:ietf:params:scim:schemas:core:2.0:User"]
   user_name     = var.oci_service_user_name
@@ -26,14 +26,14 @@ resource "oci_identity_domains_user" "git_service_user" {
 }
 
 
-resource "oci_identity_domains_group" "git_service_group" {
+resource "oci_identity_domains_group" "oci_service_group" {
   idcs_endpoint = local.idcs_endpoint
   schemas       = ["urn:ietf:params:scim:schemas:core:2.0:Group"]
   display_name  = var.oci_service_group_name
 
   members {
     type  = "User"
-    value = oci_identity_domains_user.git_service_user.id
+    value = oci_identity_domains_user.oci_service_user.id
   }
 
   lifecycle {
@@ -42,7 +42,7 @@ resource "oci_identity_domains_group" "git_service_group" {
 }
 
 
-resource "oci_identity_domains_app" "git_actions_app" {
+resource "oci_identity_domains_app" "oci_app" {
   idcs_endpoint = local.idcs_endpoint
   display_name  = var.oci_app_name
   description   = "Confidential Application used for Git Actions workload identity federation."
@@ -86,10 +86,10 @@ resource "oci_identity_domains_identity_propagation_trust" "github_actions_trust
 
   impersonation_service_users {
     rule  = "sub eq *"
-    value = oci_identity_domains_user.git_service_user.id
+    value = oci_identity_domains_user.oci_service_user.id
   }
 
-  oauth_clients = [oci_identity_domains_app.git_actions_app.name]
+  oauth_clients = [oci_identity_domains_app.oci_app.name]
 
   tags {
     key   = "managed-by"
@@ -109,14 +109,14 @@ resource "oci_identity_domains_identity_propagation_trust" "github_actions_trust
 }
 
 
-resource "oci_identity_policy" "git_actions_policy" {
+resource "oci_identity_policy" "oci_policy" {
   compartment_id = var.oci_tenancy_id
   name           = var.oci_policy_name
-  description    = "Allows ${oci_identity_domains_group.git_service_group.display_name} to manage all resources in compartment ${var.oci_compartment_id}."
+  description    = "Allows ${oci_identity_domains_group.oci_service_group.display_name} to manage all resources in compartment ${var.oci_compartment_id}."
 
   statements = [
-    "allow group ${var.oci_identity_domain_name}/${oci_identity_domains_group.git_service_group.display_name} to manage all-resources in compartment id ${var.oci_compartment_id}",
-    "allow group ${var.oci_identity_domain_name}/${oci_identity_domains_group.git_service_group.display_name} to manage dynamic-groups in tenancy"
+    "allow group ${var.oci_identity_domain_name}/${oci_identity_domains_group.oci_service_group.display_name} to manage all-resources in compartment id ${var.oci_compartment_id}",
+    "allow group ${var.oci_identity_domain_name}/${oci_identity_domains_group.oci_service_group.display_name} to manage dynamic-groups in tenancy"
   ]
 }
 
@@ -145,10 +145,10 @@ resource "oci_identity_domains_identity_propagation_trust" "gitlab_ci_trust" {
 
   impersonation_service_users {
     rule  = "sub eq *"
-    value = oci_identity_domains_user.git_service_user.id
+    value = oci_identity_domains_user.oci_service_user.id
   }
 
-  oauth_clients = [oci_identity_domains_app.git_actions_app.name]
+  oauth_clients = [oci_identity_domains_app.oci_app.name]
 
   tags {
     key   = "managed-by"

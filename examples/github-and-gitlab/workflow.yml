@@ -49,5 +49,4 @@ jobs:
         run: |
           REGION=$(echo "$OCI_OIDC_CONFIG"      | jq -r '.oci_region')
           COMPARTMENT=$(echo "$OCI_OIDC_CONFIG" | jq -r '.oci_compartment_id')
-          OCI_USER_ID=$(echo "$OCI_OIDC_CONFIG" | jq -r '.oci_user_id')
-          echo "Authenticated to region=${REGION}, compartment=${COMPARTMENT}, user=${OCI_USER_ID}"
+          echo "Authenticated to region=${REGION}, compartment=${COMPARTMENT}"

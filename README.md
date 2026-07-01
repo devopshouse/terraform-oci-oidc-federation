@@ -150,7 +150,7 @@ Leaving `ocir_allowed_repositories = []` allows the OCIR user to push/pull broad
 
 | Name | Sensitive | Description |
 |---|---|---|
-| `ci_oidc_config_json` | Yes | JSON blob for the `OCI_OIDC_CONFIG` secret. Contains IDCS endpoint, client ID/secret, region, tenancy OCID, compartment OCID, and `oci_user_id`. Written automatically as a GitHub secret when `create_github_secrets = true`. |
+| `ci_oidc_config_json` | Yes | JSON blob for the `OCI_OIDC_CONFIG` secret. Contains IDCS endpoint, client ID/secret, region, tenancy OCID, and compartment OCID. Written automatically as a GitHub secret when `create_github_secrets = true`. |
 | `iam_group_ocid` | No | OCID of the created IDCS group. |
 | `github_subject_claims` | No | Exact `sub` claim strings registered in the GitHub trust. Useful for debugging authentication failures. |
 | `gitlab_subject_claims` | No | Exact `sub` claim strings registered in the GitLab trust. |

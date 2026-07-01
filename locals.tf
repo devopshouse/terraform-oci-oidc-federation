@@ -45,6 +45,5 @@ locals {
     oci_region         = var.oci_region
     oci_tenancy_id     = oci_identity_domains_app.git_actions_app.tenancy_ocid
     oci_compartment_id = var.oci_compartment_id
-    oci_user_id        = oci_identity_domains_user.git_service_user.id
   })
 }

@@ -92,16 +92,6 @@ variable "iam_policy_name" {
   default     = "p-bootstrap-ci-oidc-manage-compartment"
 }
 
-variable "ocir_allowed_repositories" {
-  type        = list(string)
-  description = "OCIR repository names that the dedicated OCIR user may push/pull. Empty allows broad push/pull and repository creation in the compartment."
-  default     = []
-
-  validation {
-    condition     = alltrue([for repo in var.ocir_allowed_repositories : trimspace(repo) != ""])
-    error_message = "ocir_allowed_repositories must not contain empty repository names."
-  }
-}
 
 variable "oci_app_name" {
   type        = string

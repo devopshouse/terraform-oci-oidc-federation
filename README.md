@@ -20,19 +20,16 @@ GitHub / GitLab JWKS ──── publishes signing keys ────► OCI IDC
                                                      OCI APIs / OCIR
 ```
 
-OCIR authentication uses a classic username/password auth token because OCIR does not support the UPST flow. A dedicated OCIR user, auth token, group, and policy are always created alongside the service user. By default the OCIR policy allows push/pull and repository creation in the target compartment; set `ocir_allowed_repositories` to restrict push/pull to existing repository names. The generated CI secret does not include OCIR username/password fields.
+OCIR authentication uses the UPST directly: `setup-oci-auth` exchanges the CI platform OIDC JWT for a UPST, then fetches a short-lived Docker bearer token from the OCIR registry endpoint. No static auth tokens or dedicated OCIR users are required.
 
 ## Resources created
 
 | Resource | Conditional |
 |---|---|
 | IDCS service user (for UPST impersonation) | Always |
-| IDCS OCIR user + auth token (for container registry) | Always |
 | IDCS CI group (containing the UPST service user) | Always |
-| IDCS OCIR group (containing the OCIR user) | Always |
 | IDCS Confidential Application (`client_credentials`) | Always |
 | IAM policy (manage all-resources in compartment + manage dynamic-groups in tenancy) | Always |
-| IAM policy for OCIR push/pull access | Always |
 | Identity Propagation Trust for GitHub Actions | Only when `"github" ∈ ci_platforms` |
 | Identity Propagation Trust for GitLab CI | Only when `"gitlab" ∈ ci_platforms` |
 | GitHub Actions secret (`OCI_OIDC_CONFIG`) per repo | Only when `create_github_secrets = true` |
@@ -55,8 +52,6 @@ allow <user-or-group> to read objectstorage-namespaces in tenancy
 ```
 
 > **What the module grants to CI pipelines:** The IAM policy created by this module grants the CI group `manage all-resources in compartment id <oci_compartment_id>` and `manage dynamic-groups in tenancy`. Review this privilege level before deploying to production.
->
-> The dedicated OCIR user is not a member of the CI group and does not inherit `manage all-resources`. Its separate policy grants only OCIR repository permissions.
 
 ## Getting Started
 
@@ -81,18 +76,6 @@ module "oci_oidc" {
 
 After `terraform apply`, `OCI_OIDC_CONFIG` is written as an encrypted GitHub Actions secret in `my-org/my-repo`. See [`examples/github-only/`](examples/github-only/) for a full example including the workflow authentication snippet.
 
-To restrict OCIR access to existing repositories, pass exact repository names as they appear in OCI:
-
-```hcl
-ocir_allowed_repositories = [
-  "app-api",
-  "base-image",
-  "web-service",
-]
-```
-
-Leaving `ocir_allowed_repositories = []` allows the OCIR user to push/pull broadly and create repositories in `oci_compartment_id`.
-
 ## Examples
 
 | Example | Description |
@@ -111,7 +94,7 @@ Leaving `ocir_allowed_repositories = []` allows the OCIR user to push/pull broad
 | `oci_tenancy_id` | `string` | OCID of the OCI tenancy |
 | `oci_compartment_id` | `string` | OCID of the compartment where resources are created and where CI pipelines get access |
 | `oci_region` | `string` | OCI region identifier (e.g. `sa-saopaulo-1`, `us-ashburn-1`) |
-| `oci_service_user_name` | `string` | Username for the IDCS service user. A second user `{name}-ocir` is also created for OCIR auth. |
+| `oci_service_user_name` | `string` | Username for the IDCS service user used for UPST impersonation. |
 | `git_actions_group_name` | `string` | Display name for the IDCS group. Include environment tokens manually when deploying to multiple IDCS domains. |
 | `ci_platforms` | `list(string)` | Platforms to enable. Valid values: `"github"`, `"gitlab"`. Must contain at least one. |
 
@@ -140,7 +123,6 @@ Leaving `ocir_allowed_repositories = []` allows the OCIR user to push/pull broad
 |---|---|---|---|
 | `oci_identity_domain_name` | `string` | `"Default"` | Display name of the OCI Identity Domain. |
 | `app_active` | `bool` | `true` | Activates or deactivates the Confidential App and both trusts. Useful for temporarily disabling CI access without destroying resources. |
-| `ocir_allowed_repositories` | `list(string)` | `[]` | Exact OCIR repository names allowed for push/pull by the dedicated OCIR user. Empty means broad OCIR push/pull plus repository creation in `oci_compartment_id`. When non-empty, the module grants `REPOSITORY_READ` and `REPOSITORY_UPDATE` for each listed `target.repo.name`; those repositories must already exist because repository creation cannot be scoped by name. |
 | `oci_app_name` | `string` | `"CI-OIDC-Confidential-App"` | Display name for the IDCS Confidential Application. |
 | `github_trust_name` | `string` | `"GitHub-Actions-Trust"` | Name for the GitHub Actions Identity Propagation Trust. |
 | `gitlab_trust_name` | `string` | `"GitLab-CI-Trust"` | Name for the GitLab CI Identity Propagation Trust. |

@@ -25,40 +25,6 @@ resource "oci_identity_domains_user" "git_service_user" {
   }
 }
 
-# Separate non-service user required for OCIR auth token.
-# Service users do not support auth tokens in OCI Identity Domains.
-resource "oci_identity_domains_user" "ocir_user" {
-  idcs_endpoint = local.idcs_endpoint
-  schemas       = ["urn:ietf:params:scim:schemas:core:2.0:User"]
-  user_name     = "${var.oci_service_user_name}-ocir"
-
-  name {
-    family_name = "OCIR"
-    given_name  = "Service"
-    formatted   = "${var.oci_service_user_name}-ocir"
-  }
-
-  # OCI validates RFC 5322 — use a reserved domain (RFC 2606) for service users
-  emails {
-    value   = "${var.oci_service_user_name}-ocir-noreply@acme.com"
-    type    = "work"
-    primary = true
-  }
-
-  lifecycle {
-    ignore_changes = [schemas]
-  }
-}
-
-resource "oci_identity_domains_auth_token" "ocir_token" {
-  idcs_endpoint = local.idcs_endpoint
-  description   = "OCIR auth token"
-  schemas       = ["urn:ietf:params:scim:schemas:oracle:idcs:authToken"]
-
-  user {
-    value = oci_identity_domains_user.ocir_user.id
-  }
-}
 
 resource "oci_identity_domains_group" "git_actions_group" {
   idcs_endpoint = local.idcs_endpoint
@@ -75,20 +41,6 @@ resource "oci_identity_domains_group" "git_actions_group" {
   }
 }
 
-resource "oci_identity_domains_group" "ocir_group" {
-  idcs_endpoint = local.idcs_endpoint
-  schemas       = ["urn:ietf:params:scim:schemas:core:2.0:Group"]
-  display_name  = local.ocir_group_name
-
-  members {
-    type  = "User"
-    value = oci_identity_domains_user.ocir_user.id
-  }
-
-  lifecycle {
-    ignore_changes = [schemas, members]
-  }
-}
 
 resource "oci_identity_domains_app" "git_actions_app" {
   idcs_endpoint = local.idcs_endpoint
@@ -168,13 +120,6 @@ resource "oci_identity_policy" "git_actions_policy" {
   ]
 }
 
-resource "oci_identity_policy" "ocir_policy" {
-  compartment_id = var.oci_tenancy_id
-  name           = "${var.iam_policy_name}-ocir"
-  description    = "Allows ${oci_identity_domains_group.ocir_group.display_name} to push and pull images in OCIR."
-
-  statements = local.ocir_policy_statements
-}
 
 # ---------------------------------------------------------------------------
 # IDCS — Identity Propagation Trust (GitLab CI OIDC → OCI UPST)

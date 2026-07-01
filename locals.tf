@@ -18,25 +18,6 @@ locals {
 
   gitlab_audience = try(var.gitlab.audience, null)
 
-  ocir_group_name = "${var.git_actions_group_name}-ocir"
-  ocir_user_name  = "${var.oci_service_user_name}-ocir"
-  ocir_login_name = var.oci_identity_domain_name == "Default" ? local.ocir_user_name : "${var.oci_identity_domain_name}/${local.ocir_user_name}"
-
-  ocir_broad_policy_statements = [
-    "allow group ${var.oci_identity_domain_name}/${local.ocir_group_name} to manage repos in compartment id ${var.oci_compartment_id} where request.permission='REPOSITORY_READ'",
-    "allow group ${var.oci_identity_domain_name}/${local.ocir_group_name} to manage repos in compartment id ${var.oci_compartment_id} where request.permission='REPOSITORY_UPDATE'",
-    "allow group ${var.oci_identity_domain_name}/${local.ocir_group_name} to manage repos in compartment id ${var.oci_compartment_id} where request.permission='REPOSITORY_CREATE'",
-  ]
-
-  ocir_restricted_policy_statements = flatten([
-    for repo in var.ocir_allowed_repositories :
-    [
-      "allow group ${var.oci_identity_domain_name}/${local.ocir_group_name} to manage repos in compartment id ${var.oci_compartment_id} where all {target.repo.name='${repo}', request.permission='REPOSITORY_READ'}",
-      "allow group ${var.oci_identity_domain_name}/${local.ocir_group_name} to manage repos in compartment id ${var.oci_compartment_id} where all {target.repo.name='${repo}', request.permission='REPOSITORY_UPDATE'}",
-    ]
-  ])
-
-  ocir_policy_statements = length(var.ocir_allowed_repositories) == 0 ? local.ocir_broad_policy_statements : local.ocir_restricted_policy_statements
 
   ci_oidc_config_json = jsonencode({
     oci_idcs_endpoint  = local.idcs_endpoint
